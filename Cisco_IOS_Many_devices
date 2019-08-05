@@ -1,0 +1,34 @@
+from netmiko import ConnectHandler
+
+with open('devices.txt') as f:
+    devices = f.read().splitlines()
+
+device_list = list()
+
+for ip in devices:
+    cisco_device = {
+        'device_type': 'cisco_ios',
+        'ip': ip,
+        'username': 'cisco',
+        'password': 'cisco',
+        'port': 22,
+        'secret': 'cisco'
+        }
+    device_list.append(cisco_device)
+
+for device in device_list:
+    print('connecting to ' + device['ip'])
+
+    connection = ConnectHandler(**device)
+    print('entering enable mode')
+
+    connection.enable()
+
+    file = input('Enter configuration file name for ' + device['ip'] + ':')
+    print('Running commands from file', file, 'to device:', device['ip'])
+
+    output = connection.send_config_from_file(file)
+
+    print(output)
+
+connection.disconnect()
